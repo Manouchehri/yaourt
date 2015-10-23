@@ -24,7 +24,10 @@ aur_get_pkgbuild() {
 	if ((local_aurusegit)); then
 		local git_repo_url=$(pkgquery -Aif "%G" "$pkg")
 		# We're already in "$pkg"/ here, so clone to the current directory
-		git clone "$git_repo_url" . || return 1
+		git init
+		git remote add origin "$git_repo_url" || git remote set-url origin "$git_repo_url"
+		git fetch || return 1
+		git checkout -t origin/master || git checkout master
 	else
 		[[ -z "$pkgurl" ]] && pkgurl=$(pkgquery -Aif "%u" "$pkg")
 		if [[ ! "$pkgurl" ]] || ! curl_fetch -fs "$pkgurl" -o "$pkg.tar.gz"; then
